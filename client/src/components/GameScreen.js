@@ -60,11 +60,26 @@ function renderDescription(description) {
 
   if (Array.isArray(description)) {
     return description.map((item, index) => {
-      const text = typeof item === 'string' ? item : item.text;
+      const isObject = typeof item === 'object' && item !== null;
+      const text = isObject ? item.text : item;
+      const portrait = isObject ? item.portrait : null;
+
       return (
-        <p key={index} className="narration">
-          {parseFormattedText(text)}
-        </p>
+        <div key={index} className={`narration-block ${portrait ? 'with-portrait' : ''}`}>
+          {portrait && (
+            <div className="portrait-wrapper">
+              <img
+                src={`/assets/portraits/${portrait}.png`}
+                alt={portrait}
+                className="portrait-img"
+                onError={(e) => { e.target.style.display = 'none'; }}
+              />
+            </div>
+          )}
+          <div className="narration-text">
+            {parseFormattedText(text)}
+          </div>
+        </div>
       );
     });
   }
@@ -127,6 +142,13 @@ function GameScreen({ gameState, onAction, onSave, onLoad, onRestart, isLoading,
       <div className="main-layout">
         <div className="game-content">
           {message && <div className={`message ${message.type}`}>{message.text}</div>}
+
+          {gameState?.lastActionMessage && (
+            <div className="action-feedback animate-fade-in">
+              <span className="feedback-icon">≫</span>
+              {parseFormattedText(gameState.lastActionMessage)}
+            </div>
+          )}
 
           {isEnding && <div className="ending-badge">이념적 결론에 도달함</div>}
 

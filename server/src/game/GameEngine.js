@@ -61,7 +61,6 @@ class GameEngine {
     }
 
     const availableActions = this.getAvailableActions(scene);
-    console.log(`[GameEngine] Available Actions: ${availableActions.length}`);
 
     return {
       sceneId: this.currentScene,
@@ -74,6 +73,7 @@ class GameEngine {
       isEnding: scene.isEnding || false,
       unlockedEndings: [...this.unlockedEndings],
       location: scene.location || this.resources.currentLocation,
+      lastActionMessage: this.lastActionMessage || null
     };
   }
 
@@ -131,7 +131,10 @@ class GameEngine {
       this.executeEffects(action.effects);
     }
 
-    // Tick simulation after action
+    // Capture result text for immediate feedback
+    this.lastActionMessage = action.resultText ? this.processText(action.resultText) : null;
+
+    // Tick simulation after action (background decay/growth)
     this.calculateTick();
 
     // Save to history
@@ -141,10 +144,10 @@ class GameEngine {
       timestamp: Date.now()
     });
 
-    // Move to next scene
+    // Move to next scene if provided, otherwise stay on dashboard
     if (action.nextScene) {
-      const nextSceneData = this.gameData.scenes[action.nextScene];
       this.currentScene = action.nextScene;
+      const nextSceneData = this.gameData.scenes[this.currentScene];
 
       if (nextSceneData && nextSceneData.location) {
         this.resources.currentLocation = nextSceneData.location;
@@ -163,7 +166,7 @@ class GameEngine {
 
     return {
       success: true,
-      message: action.resultText || null,
+      message: this.lastActionMessage,
       state: this.getState()
     };
   }

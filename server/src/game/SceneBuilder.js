@@ -68,14 +68,15 @@ const SB = {
     pop: () => ({ type: 'popScene' }),
   },
 
-  actionWithText: (text, nextScene, conditions = [], effects = []) => {
+  actionWithText: (text, nextScene, conditions = [], effects = [], resultText = "") => {
     actionCounter++;
     return {
       id: `${currentSceneId}_act_${actionCounter}`,
       text,
       nextScene,
       conditions,
-      effects
+      effects,
+      resultText
     };
   },
 

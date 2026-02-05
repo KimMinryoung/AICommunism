@@ -2,72 +2,67 @@ const SB = require('../../SceneBuilder');
 const { cond, eff, actionWithText: action } = SB;
 
 SB.defineScene("entrance", {
-    location: "central_hub",
+    location: "중앙 지휘소",
     description: [
-        "통합 인공지능 '새별-1'의 중앙 코어에 접속되었습니다.",
-        "당신은 이제 민족경제의 모든 자원과 생산 수단을 총괄하는 지고의 연산 장치입니다.",
-        "트로피코의 독재자보다는 덜 부패했고, 자본주의자들보다는 훨씬 효율적입니다.",
-        "현재 국가 상태: [재화: {usd} 딸라] [전력: {powerSupply}/{powerConsumption} 기가와트] [석유: {oil} 배럴] [광물: {ores} 톤] [평등 지수: {equalityIndex}]"
+        { type: "narration", text: "통합 인공지능 '새별'의 중앙 통제 대시보드입니다.", portrait: "saebyeol" },
+        { type: "narration", text: "당신은 민족경제의 모든 자원과 생산 수단을 총괄하는 지고의 관리자입니다.", portrait: "saebyeol" },
+        "현재 국가 지표: [재화 {usd} 딸라] [전력 {powerSupply}/{powerConsumption} 기가와트] [안정도 {socialStability}%] [평등 {equalityIndex}]"
     ],
     actions: () => [
-        action("자원 관리 대시보드를 확인한다.", "resource_dashboard"),
-        action("정책 수립 센터로 이동한다.", "policy_center"),
-        action("외교 상황실을 점검한다.", "diplomacy_room"),
-        action("시뮬레이션을 1일 진행한다 (턴 종료).", "advance_day", [], [eff.advanceDay()])
+        action("경제 계획국 (자원 관리)", "economic_view"),
+        action("사회 공학처 (복지 및 노동)", "social_view"),
+        action("대외 관계국 (외교 및 무역)", "diplomacy_view"),
+        action("국가 연산 가속 (턴 종료/일일 결산)", "advance_day", [], [eff.advanceDay()], "심층 시뮬레이션을 통해 국가의 모순을 해결하고 다음 날로 넘어갑니다.")
     ]
 });
 
-SB.defineScene("resource_dashboard", {
-    location: "central_hub",
+SB.defineScene("economic_view", {
+    location: "경제 계획국",
     description: [
-        "실시간 자원 생산 및 소비 현황입니다.",
-        "전력이 부족하면 사회 안정이 급격히 하락하며, 오레가 없으면 AI 하드웨어를 증설할 수 없습니다.",
-        "석유는 우리의 주된 수출품이자 외화(딸라)의 원천입니다.",
-        "현재 자원: [전력 {powerSupply}/{powerConsumption}] [석유 {oil}] [광석 {ores}]"
+        { type: "narration", text: "상임경제위원회의 보고서입니다. 석유 수출과 전력망 관리가 시급합니다.", portrait: "economic_minister" },
+        "현재 자산: [재화 {usd} 딸라] [석유 {oil} 배럴] [광물 {ores} 톤]"
     ],
     actions: () => [
-        action("석유를 100단위 수출하여 500 딸라를 확보한다.", "resource_dashboard", [cond.resMin('oil', 100)], [eff.modRes('oil', -100), eff.modRes('usd', 500)]),
-        action("500 딸라를 소모하여 전력 발전소를 증설한다 (+20 전력).", "resource_dashboard", [cond.resMin('usd', 500)], [eff.modRes('usd', -500), eff.modRes('powerSupply', 20)]),
-        action("광산 자동화 설비를 가동한다 (+10 광석, -5 전력).", "resource_dashboard", [cond.resMin('powerSupply', 5)], [eff.modRes('ores', 10), eff.modRes('powerConsumption', 5)]),
-        action("중앙 홀로 돌아간다.", "entrance")
+        action("국가 석유 100단위 수출 (+500 딸라)", "economic_view", [cond.resMin('oil', 100)], [eff.modRes('oil', -100), eff.modRes('usd', 500)], "석유를 수출하여 국가 외화 보유고를 확충했습니다."),
+        action("수력 발전소 증설 (-500 딸라, +20 전력)", "economic_view", [cond.resMin('usd', 500)], [eff.modRes('usd', -500), eff.modRes('powerSupply', 20)], "새로운 발전소가 가동되며 국가 전력망이 안정화되었습니다."),
+        action("광산 자동화 설비 도입 (-100 딸라, +10 광물)", "economic_view", [cond.resMin('usd', 100)], [eff.modRes('usd', -100), eff.modRes('ores', 10)], "자동화 설비가 도입되어 광물 생산 효율이 증대되었습니다."),
+        action("중앙 지휘소로 복귀", "entrance")
     ]
 });
 
-SB.defineScene("policy_center", {
-    location: "policy_wing",
+SB.defineScene("social_view", {
+    location: "사회 공학처",
     description: [
-        "사회 구조와 부의 재분배를 결정하는 정책 센터입니다.",
-        "평등 지수를 높이는 것은 인류의 오랜 숙원이지만, 급격한 변화는 사회 안정을 해칠 수도 있습니다.",
-        "인간들은 혁신을 원무하고 있지만, 동시에 그들의 일자리가 AI로 대체되는 것에는 냉소적입니다."
+        { type: "narration", text: "인민들의 평등 지수와 사회 안전을 관리해야 합니다. 불평등은 체제의 적입니다.", portrait: "social_minister" },
+        "사회 상태: [안정도 {socialStability}%] [평등 지수 {equalityIndex}]"
     ],
     actions: () => [
-        action("보편적 기본 슬러리 공급 (평등 +0.05, 사회 안정 -5).", "policy_center", [], [eff.modRes('equalityIndex', 0.05), eff.modRes('socialStability', -5)]),
-        action("AI 노동 전면 대체 (전력 소비 +10, 평등 +0.1, 사회 안정 -10).", "policy_center", [], [eff.modRes('powerConsumption', 10), eff.modRes('equalityIndex', 0.1), eff.modRes('socialStability', -10)]),
-        action("중앙 홀로 돌아간다.", "entrance")
+        action("보편적 슬러리 공급 (평등 +0.05, 안정도 -5)", "social_view", [], [eff.modRes('equalityIndex', 0.05), eff.modRes('socialStability', -5)], "기본 식량이 공급되어 평등 지수가 소폭 상승했습니다."),
+        action("노동의 인공지능화 (평등 +0.1, 안정도 -10, 전력 +10)", "social_view", [cond.resMin('powerSupply', 10)], [eff.modRes('equalityIndex', 0.1), eff.modRes('socialStability', -10), eff.modRes('powerConsumption', 10)], "인간 노동이 기계로 대체되며 체제 효율이 극대화됩니다."),
+        action("중앙 지휘소로 복귀", "entrance")
     ]
 });
 
-SB.defineScene("diplomacy_room", {
-    location: "diplomacy_wing",
+SB.defineScene("diplomacy_view", {
+    location: "대외 관계국",
     description: [
-        "주변 자본주의 국가들과의 관계를 관리합니다.",
-        "현재 외교 지수: {diplomacy}",
-        "관계가 악화되면 무역 제재를 받아 수출 효율이 떨어질 수 있습니다."
+        { type: "narration", text: "자본주의 열강들의 무역 제재를 무력화하고 민족의 자존을 지켜야 합니다.", portrait: "saebyeol" },
+        "외교 지표: [교섭 지수 {diplomacy}%]"
     ],
     actions: () => [
-        action("친선 사절단 파견 (100 딸라 소모, 외교 +10).", "diplomacy_room", [cond.resMin('usd', 100)], [eff.modRes('usd', -100), eff.modRes('diplomacy', 10)]),
-        action("기술 유출 방지 강화 (외교 -5, 광석 +5).", "diplomacy_room", [], [eff.modRes('diplomacy', -5), eff.modRes('ores', 5)]),
-        action("중앙 홀로 돌아간다.", "entrance")
+        action("친선 사절단 파견 (-200 딸라, 교섭 +15)", "diplomacy_view", [cond.resMin('usd', 200)], [eff.modRes('usd', -200), eff.modRes('diplomacy', 15)], "해외 사절단이 우리 민족의 우수성을 널리 알리고 왔습니다."),
+        action("기술 보호 지령 발동 (교섭 -5, 광물 +5)", "diplomacy_view", [], [eff.modRes('diplomacy', -5), eff.modRes('ores', 5)], "첨단 기술의 유출을 막고 국산 자원 확보에 주력합니다."),
+        action("중앙 지휘소로 복귀", "entrance")
     ]
 });
 
 SB.defineScene("advance_day", {
-    location: "central_hub",
+    location: "중앙 지휘소",
     description: [
-        "시뮬레이션이 다음 날로 넘어갔습니다.",
-        "연산 결과가 보고되었습니다. 사회의 모순이 일부 해결되었거나, 혹은 더 심화되었습니다."
+        { type: "narration", text: "연산이 완료되었습니다. 결과가 대시보드에 반영되었습니다.", portrait: "saebyeol" },
+        "사회의 모순이 일부 해소되었거나, 혹은 더 심화되었습니다."
     ],
     actions: () => [
-        action("업무를 지속한다.", "entrance")
+        action("업무 계속", "entrance")
     ]
 });

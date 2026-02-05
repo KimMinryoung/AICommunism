@@ -184,14 +184,91 @@ body {
   position: relative;
 }
 
-.scene-description {
-  font-size: 1.1rem;
-  line-height: 1.7;
-  color: var(--text-main);
+.narration-block {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 20px;
+  align-items: flex-start;
 }
 
-.narration {
-  margin-bottom: 15px;
+.narration-block.with-portrait {
+  background: rgba(197, 160, 89, 0.05);
+  border-left: 2px solid var(--accent-gold);
+  padding: 10px;
+}
+
+.portrait-wrapper {
+  width: 80px;
+  height: 80px;
+  flex-shrink: 0;
+  border: 1px solid var(--accent-gold);
+  background: #000;
+  position: relative;
+  overflow: hidden;
+}
+
+.portrait-wrapper::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(rgba(106, 142, 142, 0.2), transparent);
+  pointer-events: none;
+}
+
+.portrait-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: sepia(0.3) contrast(1.1);
+}
+
+.narration-text {
+  flex: 1;
+  font-size: 1.05rem;
+  line-height: 1.6;
+}
+
+/* Action Feedback */
+.action-feedback {
+  background: rgba(106, 142, 142, 0.1);
+  border: 1px dashed var(--accent-cyan);
+  padding: 12px 20px;
+  margin-bottom: 25px;
+  color: var(--accent-cyan);
+  font-weight: bold;
+  font-family: 'Sunflower', sans-serif;
+  display: flex;
+  gap: 10px;
+}
+
+.feedback-icon {
+  color: var(--accent-gold);
+  animation: blink 1s infinite;
+}
+
+@keyframes blink {
+  50% {
+    opacity: 0;
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.5s ease-out forwards;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* Actions */
