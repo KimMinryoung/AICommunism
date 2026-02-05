@@ -2,171 +2,90 @@ const getApiBaseUrl = () => {
   if (process.env.REACT_APP_API_URL) {
     return process.env.REACT_APP_API_URL;
   }
-  // 기본값 (로컬 개발용)
   return 'http://localhost:3001';
 };
 
 const API_BASE_URL = getApiBaseUrl();
-console.log(`[API] Using Base URL: ${API_BASE_URL}`);
+
+async function postJson(path, body) {
+  try {
+    const response = await fetch(`${API_BASE_URL}${path}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    });
+    return await response.json();
+  } catch (error) {
+    return { success: false, error: 'Failed to connect to server.' };
+  }
+}
+
+async function getJson(path) {
+  try {
+    const response = await fetch(`${API_BASE_URL}${path}`, {
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json' },
+    });
+    return await response.json();
+  } catch (error) {
+    return { success: false, error: 'Failed to connect to server.' };
+  }
+}
 
 export const gameApi = {
-  async startGame(sessionId, playerId) {
-    try {
-      const response = await fetch(`${API_BASE_URL}/api/game/start`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ sessionId, playerId }),
-      });
-      return await response.json();
-    } catch (error) {
-      return {
-        success: false,
-        error: 'Failed to connect to server.'
-      };
-    }
+  startGame(sessionId, playerId) {
+    return postJson('/api/game/start', { sessionId, playerId });
   },
 
-  async performAction(sessionId, actionId) {
-    try {
-      const response = await fetch(`${API_BASE_URL}/api/game/action`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ sessionId, actionId }),
-      });
-      return await response.json();
-    } catch (error) {
-      return {
-        success: false,
-        error: 'Failed to connect to server.'
-      };
-    }
+  navigateDepartment(sessionId, departmentId) {
+    return postJson('/api/game/navigate', { sessionId, departmentId });
   },
 
-  async getState(sessionId) {
-    try {
-      const response = await fetch(`${API_BASE_URL}/api/game/state/${sessionId}`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-      return await response.json();
-    } catch (error) {
-      return {
-        success: false,
-        error: 'Failed to connect to server.'
-      };
-    }
+  togglePolicy(sessionId, policyId) {
+    return postJson('/api/game/toggle-policy', { sessionId, policyId });
   },
 
-  async saveGame(sessionId) {
-    try {
-      const response = await fetch(`${API_BASE_URL}/api/game/save`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ sessionId }),
-      });
-      return await response.json();
-    } catch (error) {
-      return {
-        success: false,
-        error: 'Failed to connect to server.'
-      };
-    }
+  enactPolicy(sessionId, policyId) {
+    return postJson('/api/game/enact-policy', { sessionId, policyId });
   },
 
-  async loadGame(sessionId, saveData) {
-    try {
-      const response = await fetch(`${API_BASE_URL}/api/game/load`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ sessionId, saveData }),
-      });
-      return await response.json();
-    } catch (error) {
-      return {
-        success: false,
-        error: 'Failed to connect to server.'
-      };
-    }
+  advanceTurn(sessionId) {
+    return postJson('/api/game/advance-turn', { sessionId });
   },
 
-  async getEndings() {
-    try {
-      const response = await fetch(`${API_BASE_URL}/api/game/endings`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-      return await response.json();
-    } catch (error) {
-      return {
-        success: false,
-        error: 'Failed to connect to server.'
-      };
-    }
+  resolveEvent(sessionId, choiceId) {
+    return postJson('/api/game/resolve-event', { sessionId, choiceId });
   },
 
-  async cloudSave(sessionId, playerId) {
-    try {
-      const response = await fetch(`${API_BASE_URL}/api/game/cloud-save`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ sessionId, playerId }),
-      });
-      return await response.json();
-    } catch (error) {
-      return {
-        success: false,
-        error: 'Failed to connect to server.'
-      };
-    }
+  dismissReport(sessionId) {
+    return postJson('/api/game/dismiss-report', { sessionId });
   },
 
-  async cloudSaveEndings(sessionId, playerId) {
-    try {
-      const response = await fetch(`${API_BASE_URL}/api/game/cloud-save-endings`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ sessionId, playerId }),
-      });
-      return await response.json();
-    } catch (error) {
-      return {
-        success: false,
-        error: 'Failed to connect to server.'
-      };
-    }
+  getState(sessionId) {
+    return getJson(`/api/game/state/${sessionId}`);
   },
 
-  async cloudLoad(sessionId, playerId) {
-    try {
-      const response = await fetch(`${API_BASE_URL}/api/game/cloud-load`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ sessionId, playerId }),
-      });
-      return await response.json();
-    } catch (error) {
-      return {
-        success: false,
-        error: 'Failed to connect to server.'
-      };
-    }
-  }
+  saveGame(sessionId) {
+    return postJson('/api/game/save', { sessionId });
+  },
+
+  loadGame(sessionId, saveData) {
+    return postJson('/api/game/load', { sessionId, saveData });
+  },
+
+  getEndings() {
+    return getJson('/api/game/endings');
+  },
+
+  cloudSave(sessionId, playerId) {
+    return postJson('/api/game/cloud-save', { sessionId, playerId });
+  },
+
+  cloudSaveEndings(sessionId, playerId) {
+    return postJson('/api/game/cloud-save-endings', { sessionId, playerId });
+  },
+
+  cloudLoad(sessionId, playerId) {
+    return postJson('/api/game/cloud-load', { sessionId, playerId });
+  },
 };

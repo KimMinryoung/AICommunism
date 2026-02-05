@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const GameEngine = require('../game/GameEngine');
-const gameData = require('../game/data/story');
+const endingsData = require('../game/data/endings');
 const supabase = require('../config/supabase');
 const TABLES = require('../config/tables');
 
@@ -23,10 +23,14 @@ function trackSession(sessionId, playerId) {
     });
 }
 
+function getEngine(sessionId) {
+  return sessions.get(sessionId);
+}
+
 // Start a new game
 router.post('/start', async (req, res) => {
   const { sessionId, playerId } = req.body;
-  const engine = new GameEngine(gameData);
+  const engine = new GameEngine();
   engine.start();
 
   // DB에서 이전 엔딩 기록만 불러오기
@@ -42,7 +46,6 @@ router.post('/start', async (req, res) => {
         engine.unlockedEndings = data.save_data.unlockedEndings;
       }
     } catch (err) {
-      // 실패해도 새 게임은 계속 진행
       console.log('Failed to load previous endings:', err.message);
     }
   }
@@ -56,20 +59,101 @@ router.post('/start', async (req, res) => {
   });
 });
 
-// Make a choice / perform an action
-router.post('/action', (req, res) => {
-  const { sessionId, actionId } = req.body;
+// Navigate to a department
+router.post('/navigate', (req, res) => {
+  const { sessionId, departmentId } = req.body;
 
-  const engine = sessions.get(sessionId);
+  const engine = getEngine(sessionId);
   if (!engine) {
-    return res.status(404).json({
-      success: false,
-      error: 'Game session not found. Please start a new game.'
-    });
+    return res.status(404).json({ success: false, error: 'Game session not found. Please start a new game.' });
   }
 
-  const result = engine.performAction(actionId);
+  const result = engine.navigateTo(departmentId);
+  if (!result.success) {
+    return res.status(400).json(result);
+  }
 
+  res.json(result);
+});
+
+// Toggle a policy on/off
+router.post('/toggle-policy', (req, res) => {
+  const { sessionId, policyId } = req.body;
+
+  const engine = getEngine(sessionId);
+  if (!engine) {
+    return res.status(404).json({ success: false, error: 'Game session not found. Please start a new game.' });
+  }
+
+  const result = engine.togglePolicy(policyId);
+  if (!result.success) {
+    return res.status(400).json(result);
+  }
+
+  res.json(result);
+});
+
+// Enact a one-time policy
+router.post('/enact-policy', (req, res) => {
+  const { sessionId, policyId } = req.body;
+
+  const engine = getEngine(sessionId);
+  if (!engine) {
+    return res.status(404).json({ success: false, error: 'Game session not found. Please start a new game.' });
+  }
+
+  const result = engine.enactPolicy(policyId);
+  if (!result.success) {
+    return res.status(400).json(result);
+  }
+
+  res.json(result);
+});
+
+// Advance turn (end turn → simulation → events)
+router.post('/advance-turn', (req, res) => {
+  const { sessionId } = req.body;
+
+  const engine = getEngine(sessionId);
+  if (!engine) {
+    return res.status(404).json({ success: false, error: 'Game session not found. Please start a new game.' });
+  }
+
+  const result = engine.advanceTurn();
+  if (!result.success) {
+    return res.status(400).json(result);
+  }
+
+  res.json(result);
+});
+
+// Resolve an event choice
+router.post('/resolve-event', (req, res) => {
+  const { sessionId, choiceId } = req.body;
+
+  const engine = getEngine(sessionId);
+  if (!engine) {
+    return res.status(404).json({ success: false, error: 'Game session not found. Please start a new game.' });
+  }
+
+  const result = engine.resolveEvent(choiceId);
+  if (!result.success) {
+    return res.status(400).json(result);
+  }
+
+  res.json(result);
+});
+
+// Dismiss turn report
+router.post('/dismiss-report', (req, res) => {
+  const { sessionId } = req.body;
+
+  const engine = getEngine(sessionId);
+  if (!engine) {
+    return res.status(404).json({ success: false, error: 'Game session not found. Please start a new game.' });
+  }
+
+  const result = engine.dismissReport();
   if (!result.success) {
     return res.status(400).json(result);
   }
@@ -81,12 +165,9 @@ router.post('/action', (req, res) => {
 router.get('/state/:sessionId', (req, res) => {
   const { sessionId } = req.params;
 
-  const engine = sessions.get(sessionId);
+  const engine = getEngine(sessionId);
   if (!engine) {
-    return res.status(404).json({
-      success: false,
-      error: 'Game session not found.'
-    });
+    return res.status(404).json({ success: false, error: 'Game session not found.' });
   }
 
   res.json({
@@ -99,26 +180,20 @@ router.get('/state/:sessionId', (req, res) => {
 router.post('/save', (req, res) => {
   const { sessionId } = req.body;
 
-  const engine = sessions.get(sessionId);
+  const engine = getEngine(sessionId);
   if (!engine) {
-    return res.status(404).json({
-      success: false,
-      error: 'Game session not found.'
-    });
+    return res.status(404).json({ success: false, error: 'Game session not found.' });
   }
 
   const saveData = engine.save();
-  res.json({
-    success: true,
-    saveData
-  });
+  res.json({ success: true, saveData });
 });
 
 // Load game
 router.post('/load', (req, res) => {
   const { sessionId, saveData } = req.body;
 
-  const engine = new GameEngine(gameData);
+  const engine = new GameEngine();
   const loadResult = engine.load(saveData);
 
   if (!loadResult.success) {
@@ -141,7 +216,7 @@ router.post('/cloud-save', async (req, res) => {
     return res.status(400).json({ success: false, error: 'playerId is required' });
   }
 
-  const engine = sessions.get(sessionId);
+  const engine = getEngine(sessionId);
   if (!engine) {
     return res.status(404).json({ success: false, error: 'Game session not found.' });
   }
@@ -178,7 +253,7 @@ router.post('/cloud-save-endings', async (req, res) => {
     return res.status(400).json({ success: false, error: 'playerId is required' });
   }
 
-  const engine = sessions.get(sessionId);
+  const engine = getEngine(sessionId);
   if (!engine) {
     return res.status(404).json({ success: false, error: 'Game session not found.' });
   }
@@ -190,14 +265,12 @@ router.post('/cloud-save-endings', async (req, res) => {
   try {
     const currentEndings = engine.unlockedEndings || [];
 
-    // 기존 저장 데이터 조회
     const { data: existingData } = await supabase
       .from(TABLES.SAVES)
       .select('save_data')
       .eq('player_id', playerId)
       .single();
 
-    // 기존 데이터가 있으면 unlockedEndings만 업데이트, 없으면 unlockedEndings만 저장
     const saveData = existingData?.save_data
       ? { ...existingData.save_data, unlockedEndings: currentEndings }
       : { unlockedEndings: currentEndings };
@@ -240,13 +313,12 @@ router.post('/cloud-load', async (req, res) => {
 
     if (error) {
       if (error.code === 'PGRST116') {
-        // No save found
         return res.json({ success: false, error: 'No saved game found' });
       }
       throw error;
     }
 
-    const engine = new GameEngine(gameData);
+    const engine = new GameEngine();
     const loadResult = engine.load(data.save_data);
 
     if (!loadResult.success) {
@@ -265,14 +337,12 @@ router.post('/cloud-load', async (req, res) => {
 
 router.get('/endings', (req, res) => {
   try {
-    const endings = Object.entries(gameData.scenes)
-      .filter(([id, scene]) => scene.isEnding)
-      .map(([id, scene]) => ({
-        id: id,
-        title: scene.title,
-        description: scene.description,
-        isEnding: true
-      }));
+    const endings = Object.values(endingsData).map(ending => ({
+      id: ending.id,
+      title: ending.title,
+      type: ending.type,
+      description: ending.description,
+    }));
 
     res.json({ success: true, endings });
   } catch (error) {

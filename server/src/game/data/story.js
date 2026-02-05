@@ -1,4 +1,4 @@
-// 모듈화된 스토리 파일에서 가져옴
-const gameData = require('./story_logic/index');
+// 새 데이터 레이어로 리다이렉트
+const gameData = require('./index');
 
 module.exports = gameData;

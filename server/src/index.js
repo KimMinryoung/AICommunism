@@ -6,7 +6,6 @@ require('dotenv').config({ path: path.join(__dirname, '../../.env') });
 const express = require('express');
 const cors = require('cors');
 const gameRoutes = require('./routes/game');
-const storyData = require('./game/data/story_logic');
 
 const app = express();
 const PORT = process.env.PORT || process.env.SERVER_PORT || 3001;
@@ -34,11 +33,8 @@ app.get('/api/health', (req, res) => {
 // Initialize and start server
 async function startServer() {
   try {
-    // legacy DB initialization removed
-    storyData.reinitialize();
-
     app.listen(PORT, () => {
-      console.log(`✅ AI Communism Simulation Server is running on port ${PORT}`);
+      console.log(`AI Communism Simulation Server is running on port ${PORT}`);
     });
   } catch (err) {
     console.error('Failed to start server:', err);

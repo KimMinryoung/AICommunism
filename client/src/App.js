@@ -10,7 +10,6 @@ function App() {
   const [message, setMessage] = useState(null);
   const [sessionId] = useState(() => crypto.randomUUID());
 
-  // 브라우저 고유 ID - localStorage에 영구 저장
   const [playerId] = useState(() => {
     const stored = localStorage.getItem('playerId');
     if (stored) return stored;
@@ -19,7 +18,6 @@ function App() {
     return newId;
   });
 
-  // 이전 unlockedEndings 추적 (엔딩 도달 감지용)
   const prevUnlockedEndingsRef = useRef([]);
 
   const [endingCollection, setEndingCollection] = useState([]);
@@ -28,13 +26,25 @@ function App() {
       const result = await gameApi.getEndings();
       if (result.success) {
         setEndingCollection(result.endings);
-      } else {
-        console.error("Failed to load endings:", result.error);
       }
     };
-
     fetchEndings();
   }, []);
+
+  const handleResult = useCallback((result) => {
+    if (result.success) {
+      setGameState(result.state);
+
+      // 엔딩 자동 저장
+      const prevEndings = prevUnlockedEndingsRef.current;
+      const newEndings = result.state.unlockedEndings || [];
+      if (newEndings.length > prevEndings.length) {
+        prevUnlockedEndingsRef.current = newEndings;
+        gameApi.cloudSaveEndings(sessionId, playerId);
+      }
+    }
+    return result;
+  }, [sessionId, playerId]);
 
   const startGame = useCallback(async () => {
     setIsLoading(true);
@@ -51,52 +61,96 @@ function App() {
     setIsLoading(false);
   }, [sessionId, playerId]);
 
-  const performAction = useCallback(async (actionId) => {
+  const navigateDepartment = useCallback(async (departmentId) => {
     setIsLoading(true);
     try {
-      const result = await gameApi.performAction(sessionId, actionId);
-      if (result.success) {
-        if (result.message) {
-          setMessage({ type: 'info', text: result.message });
-        } else {
-          setMessage(null);
-        }
-        setGameState(result.state);
-
-        // 새 엔딩 도달 시 엔딩 기록만 자동 저장 (게임 상태는 저장 안 함)
-        const prevEndings = prevUnlockedEndingsRef.current;
-        const newEndings = result.state.unlockedEndings || [];
-        if (newEndings.length > prevEndings.length) {
-          prevUnlockedEndingsRef.current = newEndings;
-          // 백그라운드로 엔딩 기록만 클라우드 저장 (UI 블로킹 안 함)
-          gameApi.cloudSaveEndings(sessionId, playerId).then(saveResult => {
-            if (saveResult.success) {
-              console.log('Auto-saved endings only');
-            }
-          });
-        }
-      }
+      const result = await gameApi.navigateDepartment(sessionId, departmentId);
+      handleResult(result);
+      setMessage(null);
     } catch (error) {
-      setMessage({ type: 'error', text: '게임 진행 실패. 오류 발생' });
+      setMessage({ type: 'error', text: '부서 이동 실패' });
     }
     setIsLoading(false);
-  }, [sessionId, playerId]);
+  }, [sessionId, handleResult]);
+
+  const togglePolicy = useCallback(async (policyId) => {
+    setIsLoading(true);
+    try {
+      const result = await gameApi.togglePolicy(sessionId, policyId);
+      if (!result.success) {
+        setMessage({ type: 'error', text: result.error || '정책 변경 실패' });
+      } else {
+        handleResult(result);
+        setMessage(null);
+      }
+    } catch (error) {
+      setMessage({ type: 'error', text: '정책 변경 실패' });
+    }
+    setIsLoading(false);
+  }, [sessionId, handleResult]);
+
+  const enactPolicy = useCallback(async (policyId) => {
+    setIsLoading(true);
+    try {
+      const result = await gameApi.enactPolicy(sessionId, policyId);
+      if (!result.success) {
+        setMessage({ type: 'error', text: result.error || '정책 실행 실패' });
+      } else {
+        handleResult(result);
+        setMessage(null);
+      }
+    } catch (error) {
+      setMessage({ type: 'error', text: '정책 실행 실패' });
+    }
+    setIsLoading(false);
+  }, [sessionId, handleResult]);
+
+  const advanceTurn = useCallback(async () => {
+    setIsLoading(true);
+    try {
+      const result = await gameApi.advanceTurn(sessionId);
+      handleResult(result);
+      setMessage(null);
+    } catch (error) {
+      setMessage({ type: 'error', text: '턴 진행 실패' });
+    }
+    setIsLoading(false);
+  }, [sessionId, handleResult]);
+
+  const resolveEvent = useCallback(async (choiceId) => {
+    setIsLoading(true);
+    try {
+      const result = await gameApi.resolveEvent(sessionId, choiceId);
+      handleResult(result);
+      setMessage(null);
+    } catch (error) {
+      setMessage({ type: 'error', text: '이벤트 처리 실패' });
+    }
+    setIsLoading(false);
+  }, [sessionId, handleResult]);
+
+  const dismissReport = useCallback(async () => {
+    setIsLoading(true);
+    try {
+      const result = await gameApi.dismissReport(sessionId);
+      handleResult(result);
+      setMessage(null);
+    } catch (error) {
+      setMessage({ type: 'error', text: '보고서 확인 실패' });
+    }
+    setIsLoading(false);
+  }, [sessionId, handleResult]);
 
   const saveGame = useCallback(async () => {
     try {
-      // 클라우드 저장 시도
       const cloudResult = await gameApi.cloudSave(sessionId, playerId);
-
-      // localStorage 백업도 함께 저장
       const localResult = await gameApi.saveGame(sessionId);
       if (localResult.success) {
         localStorage.setItem('textAdventureSave', JSON.stringify(localResult.saveData));
       }
-
       if (cloudResult.success) {
         setMessage({ type: 'success', text: '게임 저장됨!' });
       } else {
-        // 클라우드 실패 시 로컬만 저장됨
         setMessage({ type: 'success', text: '게임 저장됨 (로컬)' });
       }
     } catch (error) {
@@ -107,7 +161,6 @@ function App() {
   const loadGame = useCallback(async () => {
     setIsLoading(true);
     try {
-      // 클라우드에서 먼저 시도
       const cloudResult = await gameApi.cloudLoad(sessionId, playerId);
       if (cloudResult.success) {
         setGameState(cloudResult.state);
@@ -117,7 +170,6 @@ function App() {
         return;
       }
 
-      // 클라우드 실패 시 localStorage 시도
       const saveData = localStorage.getItem('textAdventureSave');
       if (!saveData) {
         setMessage({ type: 'error', text: '저장된 데이터가 없다.' });
@@ -151,7 +203,12 @@ function App() {
       ) : (
         <GameScreen
           gameState={gameState}
-          onAction={performAction}
+          onNavigate={navigateDepartment}
+          onTogglePolicy={togglePolicy}
+          onEnactPolicy={enactPolicy}
+          onAdvanceTurn={advanceTurn}
+          onResolveEvent={resolveEvent}
+          onDismissReport={dismissReport}
           onSave={saveGame}
           onLoad={loadGame}
           onRestart={startGame}

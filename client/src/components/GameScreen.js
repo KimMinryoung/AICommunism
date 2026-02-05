@@ -1,107 +1,103 @@
-import React, { useState } from 'react';
+import React from 'react';
+import ResourceBar from './ResourceBar';
+import DepartmentNav from './DepartmentNav';
+import DashboardView from './DashboardView';
+import DepartmentView from './DepartmentView';
+import TurnReportView from './TurnReportView';
+import StatusSidebar from './StatusSidebar';
+import DialogueBox from './DialogueBox';
 
-function parseFormattedText(text) {
-  const patterns = [
-    { regex: /\*\*\[([^\]]+)\]\*\*/g, className: "text-status text-emphasis" },
-    { regex: /\*\*\{\{([^}]+)\}\}\*\*/g, className: "text-item text-emphasis" },
-    { regex: /\*\*!!([^!]+)!!\*\*/g, className: "text-danger text-emphasis" },
-    { regex: /\[([^\]]+)\]/g, className: "text-status" },
-    { regex: /\*\*([^*]+)\*\*/g, className: "text-emphasis" },
-    { regex: /\{\{([^}]+)\}\}/g, className: "text-item" },
-    { regex: /!!([^!]+)!!/g, className: "text-danger" },
-  ];
+function GameScreen({
+  gameState,
+  onNavigate,
+  onTogglePolicy,
+  onEnactPolicy,
+  onAdvanceTurn,
+  onResolveEvent,
+  onDismissReport,
+  onSave,
+  onLoad,
+  onRestart,
+  isLoading,
+  message,
+}) {
+  const {
+    resources,
+    activePolicies,
+    turnPhase,
+    currentView,
+    currentTurn,
+    currentYear,
+    currentMonth,
+    departments,
+    currentDepartment,
+    policies,
+    currentEvent,
+    turnReport,
+    dialogue,
+    isEnding,
+    endingData,
+    notifications,
+  } = gameState || {};
 
-  let result = [{ text, formatted: false }];
-
-  patterns.forEach(({ regex, className }) => {
-    const newResult = [];
-    result.forEach((segment) => {
-      if (segment.formatted) {
-        newResult.push(segment);
-        return;
-      }
-
-      const str = segment.text;
-      if (typeof str !== 'string') {
-        newResult.push(segment);
-        return;
-      }
-
-      let lastIndex = 0;
-      let match;
-      regex.lastIndex = 0;
-
-      while ((match = regex.exec(str)) !== null) {
-        if (match.index > lastIndex) {
-          newResult.push({ text: str.slice(lastIndex, match.index), formatted: false });
-        }
-        newResult.push({ text: match[1], formatted: true, className, key: `${className}-${match.index}` });
-        lastIndex = regex.lastIndex;
-      }
-
-      if (lastIndex < str.length) {
-        newResult.push({ text: str.slice(lastIndex), formatted: false });
-      }
-    });
-    result = newResult;
-  });
-
-  return result.map((segment, index) =>
-    segment.formatted
-      ? <span key={segment.key || index} className={segment.className}>{segment.text}</span>
-      : segment.text
-  );
-}
-
-function renderDescription(description) {
-  if (typeof description === 'string') {
-    return <p className="narration">{parseFormattedText(description)}</p>;
-  }
-
-  if (Array.isArray(description)) {
-    return description.map((item, index) => {
-      const isObject = typeof item === 'object' && item !== null;
-      const text = isObject ? item.text : item;
-      const portrait = isObject ? item.portrait : null;
-
+  const renderMainContent = () => {
+    // 엔딩 도달
+    if (isEnding && endingData) {
       return (
-        <div key={index} className={`narration-block ${portrait ? 'with-portrait' : ''}`}>
-          {portrait && (
-            <div className="portrait-wrapper">
-              <img
-                src={`/assets/portraits/${portrait}.png`}
-                alt={portrait}
-                className="portrait-img"
-                onError={(e) => { e.target.style.display = 'none'; }}
-              />
-            </div>
-          )}
-          <div className="narration-text">
-            {parseFormattedText(text)}
+        <div className="ending-view">
+          <div className={`ending-badge ${endingData.type}`}>
+            {endingData.type === 'victory' ? '승리' : endingData.type === 'defeat' ? '패배' : '특수'} 엔딩
+          </div>
+          <h2 className="ending-title">{endingData.title}</h2>
+          <p className="ending-description">{endingData.description}</p>
+        </div>
+      );
+    }
+
+    // 턴 보고서
+    if (turnPhase === 'report') {
+      return (
+        <TurnReportView
+          turnReport={turnReport}
+          resources={resources}
+          onDismiss={onDismissReport}
+          isLoading={isLoading}
+        />
+      );
+    }
+
+    // 이벤트 처리 중
+    if (turnPhase === 'event' && currentEvent) {
+      return (
+        <div className="event-view">
+          <div className="event-header">
+            <span className="event-badge">긴급 보고</span>
+            <h2 className="event-title">{currentEvent.name}</h2>
           </div>
         </div>
       );
-    });
-  }
+    }
 
-  return null;
-}
+    // 일반 부서 뷰
+    if (currentView === 'central_command') {
+      return (
+        <DashboardView
+          resources={resources}
+          activePolicies={activePolicies}
+        />
+      );
+    }
 
-function GameScreen({ gameState, onAction, onSave, onLoad, onRestart, isLoading, message }) {
-  const { description, actions, resources, isEnding } = gameState || {};
-  const {
-    usd = 0,
-    powerSupply = 0,
-    powerConsumption = 0,
-    oil = 0,
-    ores = 0,
-    diplomacy = 0,
-    socialStability = 0,
-    equalityIndex = 0,
-    currentDay = 1
-  } = resources || {};
-
-  const isPowerDeficit = powerSupply < powerConsumption;
+    return (
+      <DepartmentView
+        department={currentDepartment}
+        policies={policies}
+        onTogglePolicy={onTogglePolicy}
+        onEnactPolicy={onEnactPolicy}
+        isLoading={isLoading}
+      />
+    );
+  };
 
   return (
     <div className="game-screen">
@@ -109,7 +105,8 @@ function GameScreen({ gameState, onAction, onSave, onLoad, onRestart, isLoading,
 
       <div className="game-header">
         <div className="game-status-hud">
-          <span>가동 일수: {currentDay}</span>
+          <span>턴 {currentTurn || 1}</span>
+          <span>{currentYear || 2045}년 {currentMonth || 1}월</span>
         </div>
         <div className="header-buttons">
           <button className="btn-secondary" onClick={onRestart} disabled={isLoading}>다시 시작</button>
@@ -118,103 +115,36 @@ function GameScreen({ gameState, onAction, onSave, onLoad, onRestart, isLoading,
         </div>
       </div>
 
-      <div className="resource-bar">
-        <div className="resource-item">
-          <span className="resource-label">국가 자산 (딸라)</span>
-          <span className="resource-value">${usd.toLocaleString()}</span>
-        </div>
-        <div className="resource-item">
-          <span className="resource-label">전력량 (기가와트)</span>
-          <span className={`resource-value ${isPowerDeficit ? 'danger' : ''}`}>
-            {powerSupply.toFixed(1)} / {powerConsumption.toFixed(1)}
-          </span>
-        </div>
-        <div className="resource-item">
-          <span className="resource-label">석유 매장량 (배럴)</span>
-          <span className="resource-value">{oil.toLocaleString()}</span>
-        </div>
-        <div className="resource-item">
-          <span className="resource-label">전략 광물 (톤)</span>
-          <span className="resource-value">{ores.toLocaleString()}</span>
-        </div>
-      </div>
+      <ResourceBar resources={resources} />
+
+      {message && <div className={`message ${message.type}`}>{message.text}</div>}
 
       <div className="main-layout">
+        <DepartmentNav
+          departments={departments}
+          currentView={currentView}
+          onNavigate={onNavigate}
+          onAdvanceTurn={onAdvanceTurn}
+          turnPhase={turnPhase}
+          isLoading={isLoading}
+        />
+
         <div className="game-content">
-          {message && <div className={`message ${message.type}`}>{message.text}</div>}
-
-          {gameState?.lastActionMessage && (
-            <div className="action-feedback animate-fade-in">
-              <span className="feedback-icon">≫</span>
-              {parseFormattedText(gameState.lastActionMessage)}
-            </div>
-          )}
-
-          {isEnding && <div className="ending-badge">이념적 결론에 도달함</div>}
-
-          <div className="scene-description">
-            {renderDescription(description)}
-          </div>
-
-          <div className="actions">
-            {actions?.map((action) => (
-              <button
-                key={action.id}
-                className="action-btn"
-                onClick={() => onAction(action.id)}
-                disabled={isLoading}
-              >
-                {action.text}
-              </button>
-            ))}
-          </div>
+          {renderMainContent()}
         </div>
 
-        <div className="game-sidebar">
-          <div className="sidebar-panel">
-            <h3>사회 현황</h3>
-
-            <div className="gauge-wrapper">
-              <div className="gauge-label">
-                <span>평등 지수</span>
-                <span>{(equalityIndex * 100).toFixed(1)}%</span>
-              </div>
-              <div className="gauge-container">
-                <div className="gauge-fill gold" style={{ width: `${equalityIndex * 100}%` }} />
-              </div>
-            </div>
-
-            <div className="gauge-wrapper">
-              <div className="gauge-label">
-                <span>사회 안정도</span>
-                <span>{socialStability}%</span>
-              </div>
-              <div className="gauge-container">
-                <div className="gauge-fill" style={{ width: `${socialStability}%` }} />
-              </div>
-            </div>
-
-            <div className="gauge-wrapper">
-              <div className="gauge-label">
-                <span>교섭 지수</span>
-                <span>{diplomacy}%</span>
-              </div>
-              <div className="gauge-container">
-                <div className="gauge-fill cyan" style={{ width: `${diplomacy}%` }} />
-              </div>
-            </div>
-          </div>
-
-          <div className="sidebar-panel">
-            <h3>시스템 통보</h3>
-            <p style={{ fontSize: '11px', color: 'var(--text-dim)', lineHeight: '1.4' }}>
-              {isPowerDeficit ?
-                "!! 전력 부족 감지 !! 사회 안정도가 하락하며 평등 지수가 감소하고 있습니다." :
-                "시스템 최적 상태. 계획 효율성 99.8% 달성."}
-            </p>
-          </div>
-        </div>
+        <StatusSidebar
+          resources={resources}
+          notifications={notifications}
+        />
       </div>
+
+      <DialogueBox
+        dialogue={dialogue}
+        currentEvent={turnPhase === 'event' ? currentEvent : null}
+        onResolveEvent={onResolveEvent}
+        isLoading={isLoading}
+      />
     </div>
   );
 }
