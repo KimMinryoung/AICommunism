@@ -9,11 +9,16 @@ const gameRoutes = require('./routes/game');
 const storyData = require('./game/data/story_logic');
 
 const app = express();
-const PORT = process.env.SERVER_PORT;
+const PORT = process.env.PORT || process.env.SERVER_PORT || 3001;
 
 // Middleware
 app.use(cors({
-  origin: ['https://AIcommunism.onrender.com', 'http://localhost:3000', 'http://localhost:3002', 'http://localhost:3001'],
+  origin: [
+    'https://ai-communism-client.onrender.com',
+    'http://localhost:3000',
+    'http://localhost:3002',
+    'http://localhost:3001'
+  ],
   methods: ['GET', 'POST', 'PUT', 'DELETE']
 }));
 app.use(express.json());

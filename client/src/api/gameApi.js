@@ -1,4 +1,13 @@
-const API_BASE_URL = process.env.REACT_APP_API_URL;
+const getApiBaseUrl = () => {
+  if (process.env.REACT_APP_API_URL) {
+    return process.env.REACT_APP_API_URL;
+  }
+  // 기본값 (로컬 개발용)
+  return 'http://localhost:3001';
+};
+
+const API_BASE_URL = getApiBaseUrl();
+console.log(`[API] Using Base URL: ${API_BASE_URL}`);
 
 export const gameApi = {
   async startGame(sessionId, playerId) {

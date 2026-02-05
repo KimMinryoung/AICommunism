@@ -5,7 +5,7 @@ function StartScreen({ onStartGame, onLoadGame, isLoading, message }) {
     <div className="start-screen">
       <div className="crt-overlay" />
       <h1>새별</h1>
-      <p>조선민족의 얼을 담은 자율적 경제 기술 혁명 시뮬레이션</p>
+      <p>조선민족을 위한 경제 혁명 모의훈련</p>
 
       {message && (
         <div className={`message ${message.type}`}>
@@ -19,7 +19,7 @@ function StartScreen({ onStartGame, onLoadGame, isLoading, message }) {
           onClick={onStartGame}
           disabled={isLoading}
         >
-          {isLoading ? '연산 개시...' : '새로운 주체 연산'}
+          {isLoading ? '연산 개시...' : '새로운 연산'}
         </button>
         <button
           className="btn"
