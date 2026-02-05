@@ -94,32 +94,32 @@ function GameScreen({ gameState, onAction, onSave, onLoad, onRestart, isLoading,
 
       <div className="game-header">
         <div className="game-status-hud">
-          <span>OPERATIONAL DAY: {currentDay}</span>
+          <span>가동 일수: {currentDay}</span>
         </div>
         <div className="header-buttons">
-          <button className="btn-secondary" onClick={onRestart} disabled={isLoading}>RESTART</button>
-          <button className="btn-secondary" onClick={onSave} disabled={isLoading}>SECURE SAVE</button>
-          <button className="btn-secondary" onClick={onLoad} disabled={isLoading}>RECALL</button>
+          <button className="btn-secondary" onClick={onRestart} disabled={isLoading}>다시 시작</button>
+          <button className="btn-secondary" onClick={onSave} disabled={isLoading}>보안 저장</button>
+          <button className="btn-secondary" onClick={onLoad} disabled={isLoading}>기록 소환</button>
         </div>
       </div>
 
       <div className="resource-bar">
         <div className="resource-item">
-          <span className="resource-label">Reserve (USD)</span>
+          <span className="resource-label">국가 자산 (딸라)</span>
           <span className="resource-value">${usd.toLocaleString()}</span>
         </div>
         <div className="resource-item">
-          <span className="resource-label">Power (GW)</span>
+          <span className="resource-label">전력량 (기가와트)</span>
           <span className={`resource-value ${isPowerDeficit ? 'danger' : ''}`}>
             {powerSupply.toFixed(1)} / {powerConsumption.toFixed(1)}
           </span>
         </div>
         <div className="resource-item">
-          <span className="resource-label">Petroleum (bbl)</span>
+          <span className="resource-label">석유 매장량 (배럴)</span>
           <span className="resource-value">{oil.toLocaleString()}</span>
         </div>
         <div className="resource-item">
-          <span className="resource-label">Strategic Ores (t)</span>
+          <span className="resource-label">전략 광물 (톤)</span>
           <span className="resource-value">{ores.toLocaleString()}</span>
         </div>
       </div>
@@ -128,7 +128,7 @@ function GameScreen({ gameState, onAction, onSave, onLoad, onRestart, isLoading,
         <div className="game-content">
           {message && <div className={`message ${message.type}`}>{message.text}</div>}
 
-          {isEnding && <div className="ending-badge">IDEOLOGICAL CONCLUSION REACHED</div>}
+          {isEnding && <div className="ending-badge">이념적 결론에 도달함</div>}
 
           <div className="scene-description">
             {renderDescription(description)}
@@ -150,11 +150,11 @@ function GameScreen({ gameState, onAction, onSave, onLoad, onRestart, isLoading,
 
         <div className="game-sidebar">
           <div className="sidebar-panel">
-            <h3>Social Status</h3>
+            <h3>사회 현황</h3>
 
             <div className="gauge-wrapper">
               <div className="gauge-label">
-                <span>Equality Index</span>
+                <span>평등 지수</span>
                 <span>{(equalityIndex * 100).toFixed(1)}%</span>
               </div>
               <div className="gauge-container">
@@ -164,7 +164,7 @@ function GameScreen({ gameState, onAction, onSave, onLoad, onRestart, isLoading,
 
             <div className="gauge-wrapper">
               <div className="gauge-label">
-                <span>Stability</span>
+                <span>사회 안정도</span>
                 <span>{socialStability}%</span>
               </div>
               <div className="gauge-container">
@@ -174,7 +174,7 @@ function GameScreen({ gameState, onAction, onSave, onLoad, onRestart, isLoading,
 
             <div className="gauge-wrapper">
               <div className="gauge-label">
-                <span>Diplomacy</span>
+                <span>교섭 지수</span>
                 <span>{diplomacy}%</span>
               </div>
               <div className="gauge-container">
@@ -184,11 +184,11 @@ function GameScreen({ gameState, onAction, onSave, onLoad, onRestart, isLoading,
           </div>
 
           <div className="sidebar-panel">
-            <h3>System Notice</h3>
+            <h3>시스템 통보</h3>
             <p style={{ fontSize: '11px', color: 'var(--text-dim)', lineHeight: '1.4' }}>
               {isPowerDeficit ?
-                "!! POWER DEFICIT DETECTED !! Social stability is deteriorating. Equality index is dropping." :
-                "System optimal. Planning efficiency at 99.8%."}
+                "!! 전력 부족 감지 !! 사회 안정도가 하락하며 평등 지수가 감소하고 있습니다." :
+                "시스템 최적 상태. 계획 효율성 99.8% 달성."}
             </p>
           </div>
         </div>

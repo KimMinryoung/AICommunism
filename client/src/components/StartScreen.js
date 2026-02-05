@@ -4,8 +4,8 @@ function StartScreen({ onStartGame, onLoadGame, isLoading, message }) {
   return (
     <div className="start-screen">
       <div className="crt-overlay" />
-      <h1>PROLETARIAT-1</h1>
-      <p>민족경제의 자율적 관리와 완전한 평등을 위한 차세대 인공지능 시뮬레이션</p>
+      <h1>새별</h1>
+      <p>조선민족의 얼을 담은 자율적 경제 기술 혁명 시뮬레이션</p>
 
       {message && (
         <div className={`message ${message.type}`}>
@@ -19,14 +19,14 @@ function StartScreen({ onStartGame, onLoadGame, isLoading, message }) {
           onClick={onStartGame}
           disabled={isLoading}
         >
-          {isLoading ? 'INITIATING...' : 'NEW SIMULATION'}
+          {isLoading ? '연산 개시...' : '새로운 주체 연산'}
         </button>
         <button
           className="btn"
           onClick={onLoadGame}
           disabled={isLoading}
         >
-          {isLoading ? 'RECALLING...' : 'RECALL STATE'}
+          {isLoading ? '기록 소환 중...' : '기록 소환'}
         </button>
       </div>
     </div>

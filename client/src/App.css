@@ -1,16 +1,25 @@
 /* Fonts */
-@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Roboto+Mono:wght@300;400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Sunflower:wght@300;500;700&family=Gowun+Batang:wght@400;700&display=swap');
 
 :root {
-  --bg-color: #050505;
-  --panel-bg: rgba(15, 15, 15, 0.9);
-  --accent-red: #d62f31;
-  --accent-cyan: #00f3ff;
-  --accent-gold: #ffcc00;
-  --text-main: #e0e0e0;
-  --text-dim: #888888;
-  --border-glow: rgba(214, 47, 49, 0.3);
-  --glass-border: rgba(255, 255, 255, 0.1);
+  --bg-color: #0c0c0e;
+  /* Night Ink */
+  --panel-bg: rgba(22, 22, 28, 0.92);
+  /* Deep Celadon Ink */
+  --accent-gold: #c5a059;
+  /* Royal Gold / Hwang (Yellow) */
+  --accent-red: #a82e3c;
+  /* Lacquer Red / Juk (Red) */
+  --accent-cyan: #6a8e8e;
+  /* Celadon Blue / Chong (Blue) */
+  --accent-jade: #2d5a4c;
+  /* Korean Jade */
+  --text-main: #d1cfc7;
+  /* Parchment White / Baek (White) */
+  --text-dim: #7a7872;
+  /* Aged Paper */
+  --border-glow: rgba(197, 160, 89, 0.25);
+  --glass-border: rgba(197, 160, 89, 0.15);
 }
 
 * {
@@ -22,22 +31,30 @@
 body {
   background-color: var(--bg-color);
   color: var(--text-main);
-  font-family: 'Roboto Mono', monospace;
+  font-family: 'Gowun Batang', serif;
   overflow-x: hidden;
   min-height: 100vh;
+  background-image:
+    radial-gradient(circle at 50% 50%, rgba(197, 160, 89, 0.05) 0%, transparent 70%),
+    linear-gradient(rgba(22, 22, 28, 0.5) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(22, 22, 28, 0.5) 1px, transparent 1px);
+  background-size: 100% 100%, 40px 40px, 40px 40px;
 }
 
-/* CRT Effect Overlay */
+/* Holographic Ink Effect Overlay */
 .crt-overlay {
   position: fixed;
   top: 0;
   left: 0;
   width: 100vw;
   height: 100vh;
-  background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
+  background:
+    linear-gradient(rgba(12, 12, 14, 0) 50%, rgba(106, 142, 142, 0.02) 50%),
+    radial-gradient(circle at 50% 50%, rgba(197, 160, 89, 0.03), transparent);
   z-index: 9999;
-  background-size: 100% 2px, 3px 100%;
+  background-size: 100% 4px, 100% 100%;
   pointer-events: none;
+  mix-blend-mode: screen;
 }
 
 .app {
@@ -65,16 +82,28 @@ body {
   padding: 15px 25px;
   background: var(--panel-bg);
   border: 1px solid var(--glass-border);
-  backdrop-filter: blur(10px);
-  border-left: 4px solid var(--accent-red);
+  backdrop-filter: blur(12px);
+  border-top: 3px solid var(--accent-gold);
+  position: relative;
+}
+
+.game-header::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--accent-gold), transparent);
 }
 
 .game-status-hud {
   display: flex;
   gap: 20px;
-  font-family: 'Orbitron', sans-serif;
-  color: var(--accent-red);
-  font-weight: bold;
+  font-family: 'Sunflower', sans-serif;
+  color: var(--accent-gold);
+  font-weight: 700;
+  letter-spacing: 2px;
 }
 
 .header-buttons {
@@ -115,7 +144,7 @@ body {
   font-size: 18px;
   font-weight: bold;
   color: var(--accent-cyan);
-  font-family: 'Orbitron', sans-serif;
+  font-family: 'Sunflower', sans-serif;
 }
 
 .resource-value.danger {
@@ -146,12 +175,13 @@ body {
 .game-content {
   background: var(--panel-bg);
   border: 1px solid var(--glass-border);
-  border-top: 2px solid var(--accent-red);
+  border-top: 4px double var(--accent-gold);
   padding: 25px;
   overflow-y: auto;
   display: flex;
   flex-direction: column;
   gap: 20px;
+  position: relative;
 }
 
 .scene-description {
@@ -173,20 +203,22 @@ body {
 }
 
 .action-btn {
-  background: rgba(214, 47, 49, 0.05);
-  border: 1px solid var(--accent-red);
-  color: var(--accent-red);
+  background: rgba(197, 160, 89, 0.03);
+  border: 1px solid var(--glass-border);
+  border-left: 4px solid var(--accent-gold);
+  color: var(--text-main);
   padding: 14px 20px;
   text-align: left;
-  font-family: 'Roboto Mono', monospace;
+  font-family: 'Gowun Batang', serif;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .action-btn:hover:not(:disabled) {
-  background: rgba(214, 47, 49, 0.15);
-  padding-left: 30px;
-  box-shadow: inset 0 0 15px rgba(214, 47, 49, 0.1);
+  background: rgba(197, 160, 89, 0.1);
+  border-left-width: 12px;
+  color: var(--accent-gold);
+  box-shadow: 0 0 20px rgba(197, 160, 89, 0.1);
 }
 
 .action-btn:disabled {
@@ -262,14 +294,15 @@ body {
 
 .btn {
   background: transparent;
-  border: 1px solid var(--accent-red);
-  color: var(--accent-red);
+  border: 1px solid var(--accent-gold);
+  color: var(--accent-gold);
   padding: 12px 30px;
-  font-size: 1.1rem;
-  font-family: 'Orbitron', sans-serif;
+  font-size: 1rem;
+  font-family: 'Sunflower', sans-serif;
   cursor: pointer;
-  transition: all 0.3s;
+  transition: all 0.4s;
   text-transform: uppercase;
+  letter-spacing: 2px;
 }
 
 .btn:hover:not(:disabled) {
@@ -354,12 +387,21 @@ body {
 }
 
 .start-screen h1 {
-  font-family: 'Orbitron', sans-serif;
-  font-size: 3.5rem;
-  color: var(--accent-red);
-  text-shadow: 0 0 15px var(--accent-red);
+  font-family: 'Sunflower', sans-serif;
+  font-size: 4rem;
+  color: var(--accent-gold);
+  text-shadow: 0 0 30px rgba(197, 160, 89, 0.4);
+  margin-bottom: 20px;
+  letter-spacing: 12px;
+  font-weight: 700;
+}
+
+.start-screen p {
+  font-family: 'Gowun Batang', serif;
+  font-size: 1.2rem;
+  color: var(--text-dim);
   margin-bottom: 40px;
-  letter-spacing: 5px;
+  letter-spacing: 1px;
 }
 
 .btn {
