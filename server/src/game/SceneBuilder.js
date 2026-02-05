@@ -87,7 +87,7 @@ const SB = {
       actionsGenerator = optionsOrActions;
     } else {
       options = optionsOrActions || {};
-      actionsGenerator = actionsFn;
+      actionsGenerator = actionsFn || (typeof options.actions === 'function' ? options.actions : undefined);
     }
 
     sceneDefinitions.set(sceneId, { options, actionsGenerator });
