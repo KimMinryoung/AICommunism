@@ -9,7 +9,7 @@ const gameRoutes = require('./routes/game');
 const storyData = require('./game/data/story_logic');
 
 const app = express();
-const PORT = process.env.PORT || 3010;
+const PORT = process.env.SERVER_PORT;
 
 // Middleware
 app.use(cors({
