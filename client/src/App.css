@@ -942,6 +942,64 @@ body {
   font-weight: bold;
 }
 
+/* Resource Bar Icons */
+.resource-icon {
+  display: none;
+}
+
+/* Resource Expand Button (Desktop - hidden) */
+.resource-expand-btn {
+  display: none;
+}
+
+/* Nav Icons (Desktop - hidden) */
+.nav-icon {
+  display: none;
+}
+
+.nav-text {
+  display: inline;
+}
+
+.turn-icon {
+  display: none;
+}
+
+.turn-text {
+  display: inline;
+}
+
+/* Sidebar Close Button (Desktop - hidden) */
+.sidebar-close-btn {
+  display: none;
+}
+
+/* Status Toggle Button (Desktop - hidden) */
+.status-toggle-btn {
+  display: none;
+}
+
+/* Sidebar Overlay (Desktop - hidden) */
+.sidebar-overlay {
+  display: none;
+}
+
+/* Danger Badge */
+.danger-badge {
+  background: var(--accent-red);
+  color: #fff;
+  padding: 2px 6px;
+  border-radius: 50%;
+  font-size: 10px;
+  margin-left: 5px;
+  animation: pulse 1s infinite alternate;
+}
+
+/* Gauge Icon */
+.gauge-icon {
+  margin-right: 4px;
+}
+
 /* Animations */
 @keyframes fadeIn {
   from {
@@ -972,4 +1030,584 @@ body {
 
 ::-webkit-scrollbar-thumb {
   background: var(--accent-red);
+}
+
+/* ============================================
+   MOBILE PORTRAIT UI/UX (세로 화면 모바일)
+   ============================================ */
+
+@media (max-width: 768px) {
+  /* Base mobile adjustments */
+  body {
+    font-size: 14px;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+  }
+
+  .app {
+    padding: 10px;
+    padding-bottom: 140px; /* 하단 네비게이션 공간 */
+  }
+
+  /* Show mobile-only elements */
+  .resource-icon {
+    display: inline;
+  }
+
+  .resource-expand-btn {
+    display: block;
+  }
+
+  .nav-icon {
+    display: block;
+    font-size: 18px;
+  }
+
+  .nav-text {
+    display: block;
+    font-size: 10px;
+    margin-top: 2px;
+  }
+
+  .turn-icon {
+    display: block;
+    font-size: 16px;
+  }
+
+  .turn-text {
+    display: block;
+    font-size: 10px;
+    margin-top: 2px;
+  }
+
+  .sidebar-close-btn {
+    display: block;
+    width: 100%;
+    background: rgba(168, 46, 60, 0.1);
+    border: 1px solid var(--accent-red);
+    color: var(--accent-red);
+    padding: 10px;
+    margin-bottom: 15px;
+    font-family: 'Sunflower', sans-serif;
+    font-size: 12px;
+    cursor: pointer;
+  }
+
+  .sidebar-close-btn:active {
+    background: var(--accent-red);
+    color: #fff;
+  }
+
+  .status-toggle-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .sidebar-overlay {
+    display: none;
+  }
+
+  .sidebar-overlay.visible {
+    display: block;
+  }
+
+  /* Game Screen Mobile Layout */
+  .game-screen {
+    margin-bottom: 0;
+    gap: 10px;
+  }
+
+  /* Header - Compact */
+  .game-header {
+    flex-direction: column;
+    gap: 10px;
+    padding: 10px 15px;
+  }
+
+  .game-status-hud {
+    gap: 15px;
+    font-size: 13px;
+    width: 100%;
+    justify-content: center;
+  }
+
+  .header-buttons {
+    width: 100%;
+    justify-content: center;
+    gap: 8px;
+  }
+
+  .header-buttons .btn-secondary {
+    font-size: 11px;
+    padding: 6px 10px;
+  }
+
+  /* Resource Bar - Mobile: 핵심 지표만 표시 */
+  .resource-bar {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 6px;
+  }
+
+  .resource-bar.expanded {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .resource-item {
+    padding: 8px 6px;
+    position: relative;
+  }
+
+  .resource-label {
+    font-size: 9px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .resource-value {
+    font-size: 14px;
+  }
+
+  /* Resource toggle button */
+  .resource-expand-btn {
+    grid-column: 1 / -1;
+    background: rgba(197, 160, 89, 0.08);
+    border: 1px solid var(--glass-border);
+    color: var(--accent-gold);
+    padding: 8px;
+    font-size: 11px;
+    font-family: 'Sunflower', sans-serif;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+
+  .resource-expand-btn:active {
+    background: rgba(197, 160, 89, 0.15);
+  }
+
+  /* Hide non-essential resources on mobile (handled by JS) */
+  .resource-item.mobile-hidden {
+    display: none;
+  }
+
+  .resource-bar.expanded .resource-item.mobile-hidden {
+    display: flex;
+  }
+
+  /* Main Layout - Single Column */
+  .main-layout {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  /* Department Nav - 하단 고정 탭 바 */
+  .department-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    flex-direction: row;
+    background: var(--panel-bg);
+    border: none;
+    border-top: 2px solid var(--accent-gold);
+    z-index: 200;
+    backdrop-filter: blur(16px);
+  }
+
+  .nav-header {
+    display: none;
+  }
+
+  .nav-list {
+    flex-direction: row;
+    flex: 1;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .nav-item {
+    flex: 1;
+    min-width: 60px;
+    padding: 12px 8px;
+    text-align: center;
+    font-size: 10px;
+    border-bottom: none;
+    border-right: 1px solid var(--glass-border);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .nav-item:last-child {
+    border-right: none;
+  }
+
+  .nav-item:hover:not(:disabled) {
+    padding-left: 8px;
+  }
+
+  .nav-item.active {
+    border-left: none;
+    border-bottom: 3px solid var(--accent-gold);
+    background: rgba(197, 160, 89, 0.12);
+  }
+
+  .nav-footer {
+    padding: 0;
+    border-top: none;
+    border-left: 1px solid var(--glass-border);
+    display: flex;
+    align-items: stretch;
+  }
+
+  .advance-turn-btn {
+    padding: 12px 15px;
+    font-size: 10px;
+    min-width: 70px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+  }
+
+  /* Game Content - Full width */
+  .game-content {
+    padding: 15px;
+    max-height: none;
+    min-height: 300px;
+  }
+
+  .view-title {
+    font-size: 1rem;
+    margin-bottom: 15px;
+  }
+
+  .view-description {
+    font-size: 0.85rem;
+  }
+
+  /* Dashboard Grid - Single column */
+  .dashboard-grid {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .dashboard-card {
+    padding: 14px;
+  }
+
+  .card-label {
+    font-size: 10px;
+  }
+
+  .card-value {
+    font-size: 1.1rem;
+  }
+
+  /* Policy Items - Mobile optimized */
+  .policy-item {
+    padding: 12px;
+    margin-bottom: 8px;
+  }
+
+  .policy-header {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .policy-name {
+    font-size: 0.9rem;
+  }
+
+  .policy-desc {
+    font-size: 0.75rem;
+  }
+
+  .policy-details {
+    flex-direction: column;
+    gap: 6px;
+    font-size: 0.7rem;
+  }
+
+  .policy-toggle,
+  .policy-enact-btn {
+    width: 100%;
+    padding: 10px;
+    font-size: 11px;
+  }
+
+  /* Turn Report - Mobile */
+  .report-columns {
+    grid-template-columns: 1fr;
+    gap: 15px;
+  }
+
+  .report-item {
+    font-size: 0.8rem;
+    padding: 8px 0;
+  }
+
+  /* Status Sidebar - Collapsible Panel */
+  .status-sidebar {
+    position: fixed;
+    top: 0;
+    right: -280px;
+    width: 280px;
+    height: 100vh;
+    background: var(--panel-bg);
+    z-index: 300;
+    transition: right 0.3s ease;
+    padding: 15px;
+    overflow-y: auto;
+    border-left: 2px solid var(--accent-gold);
+  }
+
+  .status-sidebar.open {
+    right: 0;
+  }
+
+  .sidebar-panel {
+    margin-bottom: 15px;
+  }
+
+  .sidebar-panel h3 {
+    font-size: 10px;
+  }
+
+  .gauge-label {
+    font-size: 9px;
+  }
+
+  .notification {
+    font-size: 10px;
+  }
+
+  /* Status Toggle Button */
+  .status-toggle-btn {
+    position: fixed;
+    top: 50%;
+    right: 0;
+    transform: translateY(-50%);
+    background: var(--panel-bg);
+    border: 1px solid var(--accent-gold);
+    border-right: none;
+    color: var(--accent-gold);
+    padding: 15px 8px;
+    font-size: 12px;
+    cursor: pointer;
+    z-index: 250;
+    writing-mode: vertical-rl;
+    border-radius: 8px 0 0 8px;
+    transition: all 0.3s ease;
+  }
+
+  .status-toggle-btn.has-danger {
+    background: rgba(168, 46, 60, 0.3);
+    border-color: var(--accent-red);
+    color: var(--accent-red);
+    animation: pulse 1s infinite alternate;
+  }
+
+  .status-toggle-btn:active {
+    background: rgba(197, 160, 89, 0.2);
+  }
+
+  .status-sidebar.open + .status-toggle-btn {
+    right: 280px;
+  }
+
+  /* Overlay when sidebar is open */
+  .sidebar-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 299;
+  }
+
+  .sidebar-overlay.visible {
+    display: block;
+  }
+
+  /* Dialogue Box - Mobile */
+  .dialogue-box {
+    padding: 0 10px;
+    max-width: 100%;
+    bottom: 60px; /* 하단 탭 바 위 */
+  }
+
+  .dialogue-content {
+    padding: 12px 0;
+    gap: 10px;
+  }
+
+  .dialogue-portrait {
+    width: 50px;
+    height: 50px;
+  }
+
+  .dialogue-speaker {
+    font-size: 11px;
+  }
+
+  .dialogue-text {
+    font-size: 0.85rem;
+    line-height: 1.4;
+  }
+
+  .dialogue-choices {
+    flex-direction: column;
+    padding: 6px 0 12px;
+  }
+
+  .dialogue-choice-btn {
+    padding: 12px 15px;
+    font-size: 0.8rem;
+    min-width: 100%;
+    text-align: left;
+  }
+
+  /* Event View - Mobile */
+  .event-header {
+    padding: 15px 0;
+  }
+
+  .event-badge {
+    font-size: 10px;
+    padding: 3px 12px;
+  }
+
+  .event-title {
+    font-size: 1.1rem;
+  }
+
+  /* Ending View - Mobile */
+  .ending-view {
+    padding: 20px 15px;
+  }
+
+  .ending-badge {
+    font-size: 0.8rem;
+    padding: 6px 18px;
+  }
+
+  .ending-title {
+    font-size: 1.4rem;
+  }
+
+  .ending-description {
+    font-size: 0.9rem;
+    line-height: 1.6;
+  }
+
+  /* Start Screen - Mobile */
+  .start-screen h1 {
+    font-size: 2.5rem;
+    letter-spacing: 6px;
+  }
+
+  .start-screen p {
+    font-size: 1rem;
+    padding: 0 20px;
+  }
+
+  .button-group {
+    flex-direction: column;
+    gap: 15px;
+    width: 100%;
+    padding: 0 30px;
+  }
+
+  .btn {
+    width: 100%;
+    padding: 15px 25px;
+    font-size: 1rem;
+    margin: 0;
+  }
+
+  /* Messages */
+  .message {
+    padding: 10px 15px;
+    font-size: 0.8rem;
+  }
+
+  /* Touch Tooltip (Long Press) */
+  .has-tooltip {
+    position: relative;
+  }
+
+  .touch-tooltip {
+    display: none;
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--panel-bg);
+    border: 1px solid var(--accent-gold);
+    padding: 10px 15px;
+    font-size: 12px;
+    color: var(--text-main);
+    max-width: 200px;
+    z-index: 400;
+    white-space: normal;
+    line-height: 1.4;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+  }
+
+  .touch-tooltip::after {
+    content: "";
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border: 6px solid transparent;
+    border-top-color: var(--accent-gold);
+  }
+
+  .has-tooltip.showing-tooltip .touch-tooltip {
+    display: block;
+    animation: fadeIn 0.2s ease-out;
+  }
+}
+
+/* Extra small devices */
+@media (max-width: 400px) {
+  .resource-bar {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .nav-item {
+    min-width: 50px;
+    font-size: 9px;
+    padding: 10px 6px;
+  }
+
+  .nav-item::before {
+    font-size: 16px;
+  }
+
+  .advance-turn-btn {
+    min-width: 60px;
+    font-size: 9px;
+  }
+
+  .game-content {
+    padding: 12px;
+  }
+
+  .dialogue-box {
+    padding: 0 8px;
+  }
+
+  .dialogue-portrait {
+    width: 40px;
+    height: 40px;
+  }
 }

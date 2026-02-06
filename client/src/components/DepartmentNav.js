@@ -1,5 +1,17 @@
 import React from 'react';
 
+// 부서별 아이콘 매핑
+const DEPT_ICONS = {
+  central_command: '🏛️',
+  economy: '💹',
+  energy: '⚡',
+  agriculture: '🌾',
+  defense: '🛡️',
+  technology: '🔬',
+  diplomacy: '🌐',
+  social: '👥',
+};
+
 function DepartmentNav({ departments, currentView, onNavigate, onAdvanceTurn, turnPhase, isLoading }) {
   return (
     <div className="department-nav">
@@ -11,8 +23,10 @@ function DepartmentNav({ departments, currentView, onNavigate, onAdvanceTurn, tu
             className={`nav-item ${currentView === dept.id ? 'active' : ''}`}
             onClick={() => onNavigate(dept.id)}
             disabled={isLoading || turnPhase !== 'action'}
+            data-icon={DEPT_ICONS[dept.id] || '📋'}
           >
-            {dept.name}
+            <span className="nav-icon">{DEPT_ICONS[dept.id] || '📋'}</span>
+            <span className="nav-text">{dept.name}</span>
           </button>
         ))}
       </div>
@@ -22,7 +36,8 @@ function DepartmentNav({ departments, currentView, onNavigate, onAdvanceTurn, tu
           onClick={onAdvanceTurn}
           disabled={isLoading || turnPhase !== 'action'}
         >
-          {turnPhase === 'action' ? '턴 종료' : '진행 중...'}
+          <span className="turn-icon">⏭</span>
+          <span className="turn-text">{turnPhase === 'action' ? '턴 종료' : '진행 중...'}</span>
         </button>
       </div>
     </div>
